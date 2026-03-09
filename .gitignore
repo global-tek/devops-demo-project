@@ -1,3 +1,4 @@
 /demo-java-app/target
 .idea
 .DS_Store
+*.log
