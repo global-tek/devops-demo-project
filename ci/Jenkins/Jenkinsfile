@@ -33,7 +33,7 @@ pipeline {
       }
       steps {
         script {
-            sh 'cd demo-java-app && docker build --platform linux/amd64-t ${DOCKER_IMAGE} .'
+            sh 'cd demo-java-app && docker build --platform linux/amd64 -t ${DOCKER_IMAGE} .'
             def dockerImage = docker.image("${DOCKER_IMAGE}")
             docker.withRegistry('https://index.docker.io/v1/', "dockerhub") {
                 dockerImage.push()
