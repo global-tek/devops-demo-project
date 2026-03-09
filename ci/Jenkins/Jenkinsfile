@@ -33,7 +33,7 @@ pipeline {
       }
       steps {
         script {
-            sh 'cd demo-java-app && docker build --platform linux/amd64-t ${DOCKER_IMAGE} .'
+            sh 'cd demo-java-app && docker build --platform linux/amd64 -t ${DOCKER_IMAGE} .'
             def dockerImage = docker.image("${DOCKER_IMAGE}")
             docker.withRegistry('https://index.docker.io/v1/', "dockerhub") {
                 dockerImage.push()
@@ -53,8 +53,12 @@ pipeline {
                     git config user.name "Global-tek"
                     sed -i "s/tag: .*/tag: \"${build_version}\"/" helm/app/values.yaml
                     git add helm/app/values.yaml
-                    git commit -m "Update deployment image to version ${build_version}"
-                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                    if git diff --staged --quiet; then
+                        echo "No changes to commit - tag is already ${build_version}"
+                    else
+                        git commit -m "Update deployment image to version ${build_version}"
+                        git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                    fi
                 '''
             }
         }
